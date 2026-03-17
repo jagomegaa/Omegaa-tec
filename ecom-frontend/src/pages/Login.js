@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Auth.css';
 import { AuthContext } from '../contexts/AuthContext';
-import { FaLock, FaEnvelope, FaKey, FaGoogle } from 'react-icons/fa';
+import { FaLock, FaEnvelope, FaKey } from 'react-icons/fa';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });

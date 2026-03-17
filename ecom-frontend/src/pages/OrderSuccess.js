@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
-import { FaCheckCircle, FaHome, FaShoppingBag, FaTruck } from "react-icons/fa";
+import { FaCheckCircle, FaHome, FaShoppingBag } from "react-icons/fa";
 import "./OrderSuccess.css";
 
 export default function OrderSuccess() {

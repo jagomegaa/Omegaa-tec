@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import api from '../api';
 import { AuthContext } from '../contexts/AuthContext';
 import { BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill, BsFillBellFill, BsCurrencyDollar } from 'react-icons/bs';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie } from 'recharts';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie } from 'recharts';
 
 function AdminHome() {
   const [stats, setStats] = useState({
@@ -18,13 +18,9 @@ function AdminHome() {
   const [salesData, setSalesData] = useState([]);
   const [userGrowthData, setUserGrowthData] = useState([]);
 
-  const { token, isLoggedIn } = useContext(AuthContext);
+  const { } = useContext(AuthContext);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [token, isLoggedIn]);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -85,7 +81,11 @@ function AdminHome() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const generateSalesData = (orders) => {
     // Process real order data for charts
@@ -107,25 +107,6 @@ function AdminHome() {
       { name: 'Total', value: userStats.totalUsers },
       { name: 'Verified', value: userStats.verifiedUsers },
       { name: 'New Today', value: userStats.newUsersToday }
-    ];
-  };
-
-  const generateSampleSalesData = () => {
-    return [
-      { name: 'Jan', sales: 4000, revenue: 2400 },
-      { name: 'Feb', sales: 3000, revenue: 1398 },
-      { name: 'Mar', sales: 2000, revenue: 9800 },
-      { name: 'Apr', sales: 2780, revenue: 3908 },
-      { name: 'May', sales: 1890, revenue: 4800 },
-      { name: 'Jun', sales: 2390, revenue: 3800 }
-    ];
-  };
-
-  const generateSampleGrowthData = () => {
-    return [
-      { name: 'Total', value: 89 },
-      { name: 'Verified', value: 66 },
-      { name: 'New Today', value: 5 }
     ];
   };
 

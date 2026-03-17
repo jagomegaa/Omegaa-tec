@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./AboutUs.css";
 import bulletImg from "../assets/bullet.jpg";
 import domeImg from "../assets/dome.jpg";
@@ -21,26 +21,6 @@ const featuredProducts = [
     desc: "Advanced fire detection and alarm system for early warning and rapid response in emergencies."
   }
 ];
-
-// --- Animated Counter Component ---
-function AnimatedCounter({ end, duration }) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const increment = end / (duration / 20);
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= end) {
-        setCount(end);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(start));
-      }
-    }, 20);
-    return () => clearInterval(timer);
-  }, [end, duration]);
-  return <span>{count}</span>;
-}
 
 const AboutUs = () => (
   <div className="aboutus2-container">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
-import { FaShoppingCart, FaStar, FaTruck, FaShieldAlt, FaHeadphones, FaArrowRight, FaSearch, FaBox, FaClock, FaMapMarkerAlt, FaUserShield } from "react-icons/fa";
+import { FaShoppingCart, FaStar, FaTruck, FaShieldAlt, FaHeadphones, FaArrowRight, FaSearch, FaBox, FaClock, FaMapMarkerAlt } from "react-icons/fa";
 import { AuthContext } from "../contexts/AuthContext";
 import { CartContext } from "../contexts/CartContext";
 import api from "../api";

@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
-import api from '../api';
-import { AuthContext } from '../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
 import './AdminProducts.css';
 
 // Resolve image URLs robustly so frontend works both locally and in production.
@@ -37,8 +35,6 @@ const AdminProducts = () => {
   });
   const [editingId, setEditingId] = useState(null);
   const [image, setImage] = useState(null);
-
-  const { token, isLoggedIn } = useContext(AuthContext);
 
   useEffect(() => {
     fetchProducts();

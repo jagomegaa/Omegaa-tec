@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { FaTh, FaList, FaTag, FaMapMarkerAlt, FaSearch, FaShoppingCart, FaBolt, FaFilter, FaStar, FaHeart, FaEye } from 'react-icons/fa';
+import { FaTh, FaList, FaTag, FaMapMarkerAlt, FaBolt, FaFilter, FaStar, FaHeart, FaEye } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useNotification } from '../contexts/NotificationContext';
-import { useCart } from '../contexts/CartContext';
 import './ProductList.css';
 
 const ProductList = () => {
@@ -13,7 +11,6 @@ const ProductList = () => {
   const [pagination, setPagination] = useState({});
   const [viewMode, setViewMode] = useState('grid');
   const [loading, setLoading] = useState(false);
-  const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [minPrice, setMinPrice] = useState('');
@@ -21,8 +18,6 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hideOutOfStock, setHideOutOfStock] = useState(false);
   const navigate = useNavigate();
-  const { showSuccess, showError } = useNotification();
-  const { addToCart: addToCartContext } = useCart();
 
   // Fetch categories
   useEffect(() => {
@@ -39,7 +34,6 @@ const ProductList = () => {
     setLoading(true);
     const params = {};
     if (selectedCategory !== "all") params.category = selectedCategory;
-    if (search.trim()) params.search = search.trim();
     if (minPrice) params.min = minPrice;
     if (maxPrice) params.max = maxPrice;
     params.page = page;
@@ -66,21 +60,6 @@ const ProductList = () => {
     fetchProducts();
     // eslint-disable-next-line
   }, [selectedCategory]);
-
-  // Handle search submit
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    fetchProducts();
-  };
-
-const addToCart = async (productId, quantity) => {
-    try {
-        await addToCartContext(productId, quantity);
-        showSuccess('Added to cart!');
-    } catch (error) {
-        showError('Failed to add to cart.');
-    }
-};
 
   const handleBuyNow = (product) => {
     navigate('/checkout', { state: { product } });

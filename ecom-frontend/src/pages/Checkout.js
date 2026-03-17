@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from '../api';
 import { AuthContext } from '../contexts/AuthContext';
-import { FaUser, FaMapMarkerAlt, FaGooglePay, FaMoneyBillWave, FaUniversity, FaCreditCard, FaShieldAlt, FaTruck, FaCheckCircle, FaLock, FaArrowRight, FaPlus, FaMinus } from "react-icons/fa";
+import { FaUser, FaMapMarkerAlt, FaGooglePay, FaMoneyBillWave, FaUniversity, FaCreditCard, FaShieldAlt, FaTruck, FaCheckCircle, FaLock, FaArrowRight } from "react-icons/fa";
 import "./Checkout.css";
 
 export default function Checkout() {
@@ -10,7 +10,6 @@ export default function Checkout() {
   const navigate = useNavigate();
 
   const [checkoutData, setCheckoutData] = useState(null);
-  const [isBuyNow, setIsBuyNow] = useState(false);
   const [user, setUser] = useState({ name: "", address: "" });
   const [paymentMethod, setPaymentMethod] = useState("gpay");
   const [selectedBank, setSelectedBank] = useState('');
@@ -25,7 +24,6 @@ export default function Checkout() {
     console.log("Location State:", location.state);
     // Check if user came from "Buy Now" or cart
     if (location.state?.product) {
-      setIsBuyNow(true);
       const product = location.state.product;
       const quantity = location.state.quantity || 1;
       const totalAmount = product.price * quantity;
@@ -38,7 +36,6 @@ export default function Checkout() {
         totalAmount: totalAmount
       });
     } else if (location.state?.cart) {
-      setIsBuyNow(false);
       setCheckoutData(location.state.cart);
     }
   }, [location.state]);
@@ -66,27 +63,6 @@ export default function Checkout() {
   const handlePaymentMethodChange = (method) => {
     setPaymentMethod(method);
     setSelectedPaymentOption(method);
-  };
-
-  const handleQuantityChange = (productId, newQuantity) => {
-    if (newQuantity < 1) return;
-
-    setCheckoutData(prevData => {
-      const updatedItems = prevData.items.map(item => {
-        if (item.product._id === productId) {
-          return { ...item, quantity: newQuantity };
-        }
-        return item;
-      });
-
-      const newTotalAmount = updatedItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
-
-      return {
-        ...prevData,
-        items: updatedItems,
-        totalAmount: newTotalAmount
-      };
-    });
   };
 
   const handleSubmit = async (e) => {

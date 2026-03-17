@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import api from '../api';
 import './CartPage.css';
 import { useNavigate } from 'react-router-dom';
@@ -11,15 +11,7 @@ const CartPage = () => {
   const navigate = useNavigate();
   const { token, isLoggedIn } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (!isLoggedIn || !token) {
-      navigate('/login');
-      return;
-    }
-    fetchCart();
-  }, []);
-
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/api/cart');
@@ -29,7 +21,15 @@ const CartPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn || !token) {
+      navigate('/login');
+      return;
+    }
+    fetchCart();
+  }, [isLoggedIn, token, navigate, fetchCart]);
 
   const updateQty = async (productId, quantity) => {
     if (quantity < 1) return;

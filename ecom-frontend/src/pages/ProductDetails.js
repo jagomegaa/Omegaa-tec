@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../contexts/AuthContext';
 import './ProductDetails.css';
-import { FaHeart, FaShoppingCart, FaTruck, FaShieldAlt, FaUndo, FaShareAlt, FaStar, FaMapMarkerAlt, FaTag, FaBolt, FaEye, FaThumbsUp } from 'react-icons/fa';
+import { FaHeart, FaShoppingCart, FaTruck, FaShieldAlt, FaUndo, FaShareAlt, FaTag, FaEye, FaThumbsUp } from 'react-icons/fa';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -23,16 +23,7 @@ const ProductDetails = () => {
 
   const { token, user: authUser, isLoggedIn } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (authUser) setUser(authUser);
-
-    fetchProduct();
-    fetchRelatedProducts();
-    fetchReviews();
-    checkWishlistStatus();
-  }, [id, authUser]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const response = await api.get(`/api/products/${id}`);
       setProduct(response.data);
@@ -41,27 +32,27 @@ const ProductDetails = () => {
       console.error('Error fetching product:', error);
       setLoading(false);
     }
-  };
+  }, [id]);
 
-  const fetchRelatedProducts = async () => {
+  const fetchRelatedProducts = useCallback(async () => {
     try {
       const response = await api.get(`/api/products/related/${id}`);
       setRelatedProducts(response.data);
     } catch (error) {
       console.error('Error fetching related products:', error);
     }
-  };
+  }, [id]);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const response = await api.get(`/api/products/${id}/reviews`);
       setReviews(response.data);
     } catch (error) {
       console.error('Error fetching reviews:', error);
     }
-  };
+  }, [id]);
 
-  const checkWishlistStatus = async () => {
+  const checkWishlistStatus = useCallback(async () => {
     if (!user) return;
     try {
       const response = await api.get(`/api/wishlist/${user._id}`);
@@ -69,7 +60,16 @@ const ProductDetails = () => {
     } catch (error) {
       console.error('Error checking wishlist status:', error);
     }
-  };
+  }, [user, id]);
+
+  useEffect(() => {
+    if (authUser) setUser(authUser);
+
+    fetchProduct();
+    fetchRelatedProducts();
+    fetchReviews();
+    checkWishlistStatus();
+  }, [id, authUser, fetchProduct, fetchRelatedProducts, fetchReviews, checkWishlistStatus]);
 
   const handleAddToCart = async () => {
     try {

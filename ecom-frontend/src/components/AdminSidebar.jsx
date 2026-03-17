@@ -1,7 +1,7 @@
 import React from 'react'
 import
 {BsCart3, BsGrid1X2Fill, BsFillArchiveFill, BsFillGrid3X3GapFill, BsPeopleFill,
-  BsListCheck, BsMenuButtonWideFill, BsFillGearFill, BsTruck}
+  BsListCheck, BsMenuButtonWideFill, BsFillGearFill}
  from 'react-icons/bs'
 
 function AdminSidebar({openSidebarToggle, OpenSidebar, onNavigate, currentView}) {

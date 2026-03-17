@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OrderTracking.css';
 import { AuthContext } from '../contexts/AuthContext';
@@ -15,21 +15,21 @@ export default function OrderTracking() {
 
   const { token, isLoggedIn } = useContext(AuthContext);
 
-  useEffect(() => {
-    // Fetch user's orders for quick selection
-    fetchUserOrders();
-
-    // Check if orderId is in URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderIdFromUrl = urlParams.get('orderId');
-    if (orderIdFromUrl) {
-      setOrderId(orderIdFromUrl);
-      // Auto-track the order if ID is provided in URL
-      handleTrackOrderFromUrl(orderIdFromUrl);
+  const fetchUserOrders = useCallback(async () => {
+    try {
+      if (!isLoggedIn || !token) {
+        navigate('/login');
+        return;
+      }
+      const response = await api.get('/api/orders/user');
+      setUserOrders(response.data);
+    } catch (err) {
+      // Log detailed error info to help debugging (network / server response / message)
+      console.error('Failed to fetch user orders:', err?.response?.data || err?.response?.status || err?.message || err);
     }
-  }, []);
+  }, [isLoggedIn, token, navigate]);
 
-  const handleTrackOrderFromUrl = async (orderId) => {
+  const handleTrackOrderFromUrl = useCallback(async (orderId) => {
     setLoading(true);
     setError('');
     setOrder(null);
@@ -59,21 +59,21 @@ export default function OrderTracking() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isLoggedIn, token, navigate]);
 
-  const fetchUserOrders = async () => {
-    try {
-      if (!isLoggedIn || !token) {
-        navigate('/login');
-        return;
-      }
-      const response = await api.get('/api/orders/user');
-      setUserOrders(response.data);
-    } catch (err) {
-      // Log detailed error info to help debugging (network / server response / message)
-      console.error('Failed to fetch user orders:', err?.response?.data || err?.response?.status || err?.message || err);
+  useEffect(() => {
+    // Fetch user's orders for quick selection
+    fetchUserOrders();
+
+    // Check if orderId is in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderIdFromUrl = urlParams.get('orderId');
+    if (orderIdFromUrl) {
+      setOrderId(orderIdFromUrl);
+      // Auto-track the order if ID is provided in URL
+      handleTrackOrderFromUrl(orderIdFromUrl);
     }
-  };
+  }, [fetchUserOrders, handleTrackOrderFromUrl]);
 
   const handleTrackOrder = async (e) => {
     e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../api';
 import { AuthContext } from './AuthContext';
 
@@ -19,7 +19,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const { token } = useContext(AuthContext);
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     if (token) {
       try {
         const headers = { Authorization: `Bearer ${token}` };
@@ -39,7 +39,7 @@ export const CartProvider = ({ children }) => {
       setCartItemCount(0);
       setCartItems([]);
     }
-  };
+  }, [token]);
 
   const updateCartItemCount = (count) => {
     setCartItemCount(count);
@@ -64,7 +64,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     // Re-fetch cart whenever token changes (login/logout)
     fetchCart().catch(() => {});
-  }, [token]);
+  }, [fetchCart]);
 
   return (
     <CartContext.Provider value={{

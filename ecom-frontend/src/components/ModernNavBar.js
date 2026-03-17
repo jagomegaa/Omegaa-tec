@@ -1,17 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaUser, FaBars, FaTimes } from 'react-icons/fa';
+import { FaUser, FaBars, FaTimes } from 'react-icons/fa';
 import { AuthContext } from '../contexts/AuthContext';
-import { CartContext } from '../contexts/CartContext';
 import './ModernNavBar.css';
 
 const ModernNavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, user, logout } = useContext(AuthContext);
-  const { cartItems } = useContext(CartContext);
 
   const navItems = [
     { path: '/', label: 'Home' },
@@ -21,20 +18,10 @@ const ModernNavBar = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-    }
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/');
   };
-
-  const cartItemCount = cartItems?.reduce((total, item) => total + item.quantity, 0) || 0;
 
   return (
     <nav className="flipkart-navbar">
