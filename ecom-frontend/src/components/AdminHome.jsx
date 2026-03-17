@@ -17,8 +17,7 @@ function AdminHome() {
   const [error, setError] = useState(null);
   const [salesData, setSalesData] = useState([]);
   const [userGrowthData, setUserGrowthData] = useState([]);
-
-  const { } = useContext(AuthContext);
+  useContext(AuthContext);
 
   const fetchDashboardData = useCallback(async () => {
     try {
