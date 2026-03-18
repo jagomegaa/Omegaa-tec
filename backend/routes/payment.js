@@ -6,18 +6,27 @@ const auth = require('../middleware/auth');
 const crypto = require('crypto');
 const Order = require('../models/Order');
 
-// Use environment variables for keys so they are not hard-coded.
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_7ALd8ndNWkk7vu';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'qfXln0bCfVRJwDEa7FADi8Tl';
+// Keys must come from environment variables (never hard-code secrets).
+const RAZORPAY_KEY_ID = (process.env.RAZORPAY_KEY_ID || '').trim();
+const RAZORPAY_KEY_SECRET = (process.env.RAZORPAY_KEY_SECRET || '').trim();
 
-if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-  console.warn('Razorpay keys are not set in environment — using defaults. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in production.');
+if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
+  console.warn('Razorpay keys are not set in environment. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.');
 }
 
-const razorpay = new Razorpay({
-  key_id: RAZORPAY_KEY_ID,
-  key_secret: RAZORPAY_KEY_SECRET
-});
+function getRazorpayClient() {
+  if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
+    // Fail fast with a clear error instead of making a confusing API call.
+    const e = new Error('Razorpay is not configured (missing RAZORPAY_KEY_ID/RAZORPAY_KEY_SECRET)');
+    e.statusCode = 500;
+    throw e;
+  }
+
+  return new Razorpay({
+    key_id: RAZORPAY_KEY_ID,
+    key_secret: RAZORPAY_KEY_SECRET,
+  });
+}
 
 // Create payment order - requires authentication
 router.post('/create-order', auth, async (req, res) => {
@@ -34,18 +43,35 @@ router.post('/create-order', auth, async (req, res) => {
       payment_capture: 1
     };
 
+    const razorpay = getRazorpayClient();
     const order = await razorpay.orders.create(options);
     // return the raw Razorpay order object (id, amount, currency etc.)
     res.json(order);
   } catch (err) {
-    console.error('Create Razorpay order error:', err);
-    res.status(500).json({ error: 'Failed to create order' });
+    // Razorpay SDK errors often contain useful fields like:
+    // err.statusCode, err.error (object), err.message
+    const status = err?.statusCode && Number.isInteger(err.statusCode) ? err.statusCode : 500;
+    const razorpayError = err?.error;
+
+    console.error('Create Razorpay order error:', {
+      statusCode: err?.statusCode,
+      message: err?.message,
+      error: razorpayError,
+    });
+
+    // Don't leak sensitive details, but return enough to diagnose misconfig.
+    res.status(status).json({
+      error: 'Failed to create order',
+      details: razorpayError?.description || err?.message || 'Unknown error',
+    });
   }
 });
 
 // Verify payment signature - requires authentication
 router.post('/verify-signature', auth, async (req, res) => {
   try {
+    // Ensure keys are present (secret required for HMAC)
+    getRazorpayClient();
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {

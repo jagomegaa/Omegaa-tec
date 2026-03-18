@@ -98,8 +98,15 @@ export default function Checkout() {
         const { id: order_id, amount, currency } = orderRes.data;
 
         // 2. Open Razorpay checkout
+        const razorpayKey =
+          (process.env.REACT_APP_RAZORPAY_KEY_ID || process.env.REACT_APP_RAZORPAY_KEY || '').trim();
+        if (!razorpayKey) {
+          setLoading(false);
+          setError('Razorpay is not configured. Please contact support.');
+          return;
+        }
         const options = {
-          key: process.env.REACT_APP_RAZORPAY_KEY || "rzp_test_7ALd8ndNWkk7vu",
+          key: razorpayKey,
           amount: amount,
           currency: currency,
           name: "Omegaatec",
