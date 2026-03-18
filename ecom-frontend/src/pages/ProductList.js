@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { FaTh, FaList, FaTag, FaMapMarkerAlt, FaBolt, FaFilter, FaStar, FaHeart, FaEye } from 'react-icons/fa';
+import { FaTh, FaList, FaTag, FaMapMarkerAlt, FaBolt, FaFilter, FaStar, FaEye } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import './ProductList.css';
 
@@ -211,12 +211,6 @@ const ProductList = () => {
                     </div>
                   )}
                   <div className="product-actions-overlay">
-                    <button
-                      className="action-btn wishlist-btn"
-                      title="Add to Wishlist"
-                    >
-                      <FaHeart />
-                    </button>
                     <button
                       className="action-btn quick-view-btn"
                       title="Quick View"

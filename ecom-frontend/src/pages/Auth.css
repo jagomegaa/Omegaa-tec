@@ -729,6 +729,46 @@
   padding-left: 50px;
 }
 
+/* Login-only: no input icons + password toggle */
+.auth-container.no-input-icons .input-icon {
+  display: none;
+}
+
+.auth-container.no-input-icons input {
+  padding-left: 20px;
+  padding-right: 90px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto !important;
+  padding: 8px 12px !important;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: rgba(102, 126, 234, 0.12);
+  color: #4c51bf;
+  border: 1px solid rgba(102, 126, 234, 0.25);
+  box-shadow: none !important;
+}
+
+.password-toggle-btn:hover {
+  transform: translateY(-50%) scale(1.02);
+  background: rgba(102, 126, 234, 0.18);
+}
+
+.password-toggle-btn:active {
+  transform: translateY(-50%);
+}
+
+.password-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Resend Button */
 .resend-btn {
   background: none;

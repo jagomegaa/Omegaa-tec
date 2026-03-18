@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Auth.css';
 import { AuthContext } from '../contexts/AuthContext';
-import { FaLock, FaEnvelope, FaKey } from 'react-icons/fa';
+import { FaLock, FaEnvelope } from 'react-icons/fa';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -10,6 +10,7 @@ const Login = () => {
   const [locked, setLocked] = useState(false);
   const [notVerified, setNotVerified] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const verified = location.state && location.state.verified;
@@ -63,7 +64,7 @@ const Login = () => {
 
   return (
     <div className="bg-image-page">
-      <div className="auth-container">
+      <div className="auth-container no-input-icons">
         <div className="security-badge">🔒 Secure Login</div>
         <h2>
           <FaLock style={{ marginRight: '0.5rem', color: '#667eea' }} />
@@ -78,7 +79,6 @@ const Login = () => {
 
         <form className="auth-form" onSubmit={handleLogin}>
           <div className="form-group">
-            <FaEnvelope className="input-icon" />
             <input
               name="email"
               type="email"
@@ -91,16 +91,24 @@ const Login = () => {
           </div>
 
           <div className="form-group">
-            <FaKey className="input-icon" />
             <input
               name="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               value={form.password}
               onChange={handleChange}
               required
               disabled={loading}
             />
+            <button
+              type="button"
+              className="password-toggle-btn"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              disabled={loading}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
           </div>
 
           <div className="forgot-password-link">

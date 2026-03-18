@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../contexts/AuthContext';
 import './ProductDetails.css';
-import { FaHeart, FaShoppingCart, FaTruck, FaShieldAlt, FaUndo, FaShareAlt, FaTag, FaEye, FaThumbsUp } from 'react-icons/fa';
+import { FaShoppingCart, FaTruck, FaShieldAlt, FaUndo, FaShareAlt, FaTag, FaEye, FaThumbsUp } from 'react-icons/fa';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -14,12 +14,10 @@ const ProductDetails = () => {
   const [reviews, setReviews] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState('description');
   const [showShareModal, setShowShareModal] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [isZooming, setIsZooming] = useState(false);
-  const [user, setUser] = useState(null);
 
   const { token, user: authUser, isLoggedIn } = useContext(AuthContext);
 
@@ -52,24 +50,11 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  const checkWishlistStatus = useCallback(async () => {
-    if (!user) return;
-    try {
-      const response = await api.get(`/api/wishlist/${user._id}`);
-      setIsWishlisted(response.data.some(item => item.productId === id));
-    } catch (error) {
-      console.error('Error checking wishlist status:', error);
-    }
-  }, [user, id]);
-
   useEffect(() => {
-    if (authUser) setUser(authUser);
-
     fetchProduct();
     fetchRelatedProducts();
     fetchReviews();
-    checkWishlistStatus();
-  }, [id, authUser, fetchProduct, fetchRelatedProducts, fetchReviews, checkWishlistStatus]);
+  }, [id, authUser, fetchProduct, fetchRelatedProducts, fetchReviews]);
 
   const handleAddToCart = async () => {
     try {
@@ -85,28 +70,6 @@ const ProductDetails = () => {
       showNotification('Added to cart!', 'success');
     } catch (error) {
       showNotification('Error adding to cart', 'error');
-    }
-  };
-
-  const handleWishlistToggle = async () => {
-    try {
-      if (!isLoggedIn || !token) {
-        navigate('/login');
-        return;
-      }
-      if (isWishlisted) {
-        await api.delete('/api/wishlist/remove', {
-          data: { productId: product._id }
-        });
-        setIsWishlisted(false);
-        showNotification('Removed from wishlist', 'success');
-      } else {
-        await api.post('/api/wishlist/add', { productId: product._id });
-        setIsWishlisted(true);
-        showNotification('Added to wishlist!', 'success');
-      }
-    } catch (error) {
-      showNotification('Error managing wishlist', 'error');
     }
   };
 
@@ -265,13 +228,6 @@ const ProductDetails = () => {
           <div className="product-header">
             <h1 className="product-name">{product.name}</h1>
             <div className="product-actions-header">
-              <button
-                className={`wishlist-btn ${isWishlisted ? 'active' : ''}`}
-                onClick={handleWishlistToggle}
-                title="Add to Wishlist"
-              >
-                <FaHeart />
-              </button>
               <button
                 className="share-btn"
                 onClick={() => setShowShareModal(true)}
@@ -458,7 +414,7 @@ const ProductDetails = () => {
               </div>
 
               {/* Review Submission Form */}
-              {user && (
+              {authUser && (
                 <div className="review-form">
                   <h4>Write a Review</h4>
                   <form onSubmit={async (e) => {
@@ -472,11 +428,16 @@ const ProductDetails = () => {
                           showNotification('Please login to submit review', 'error');
                           return;
                         }
+                        const userName =
+                          (authUser?.name && String(authUser.name).trim()) ||
+                          `${authUser?.firstName || ''} ${authUser?.lastName || ''}`.trim() ||
+                          authUser?.email?.split('@')?.[0] ||
+                          'User';
                         const response = await api.post(`/api/products/${id}/reviews`, {
                         rating,
                         comment,
-                        userId: user._id,
-                        userName: `${user.firstName} ${user.lastName}`
+                        userId: authUser._id,
+                        userName
                         });
 
                       // Add the new review to the list
@@ -512,7 +473,7 @@ const ProductDetails = () => {
                 </div>
               )}
 
-              {!user && (
+              {!authUser && (
                 <div className="review-login-prompt">
                   <p>Please <Link to="/login">login</Link> to write a review.</p>
                 </div>

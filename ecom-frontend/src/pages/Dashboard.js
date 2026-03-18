@@ -80,12 +80,6 @@ function UserPanel() {
         icon="📍"
       />
       <DashboardCard
-        label="Wishlist"
-        color="#e91e63"
-        onClick={() => window.location.href = "/wishlist"}
-        icon="💖"
-      />
-      <DashboardCard
         label="Profile Settings"
         color="#ff9800"
         onClick={() => navigate("/profile-settings")}
